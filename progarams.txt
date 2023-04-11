@@ -1,0 +1,264 @@
+***Travelling selesman***
+
+Domains
+ town = symbol 
+ distance = integer  
+ predicates 
+    nondeterm road(town,town,distance)
+    nondeterm route(town,town,distance)   
+ clauses road("A","B",30).
+    road("C","A",30). 
+    road("B","C",145).
+    road("B","E",90). 
+    road("C","E",55).
+    route(Town1,Town2,Distance):-road(Town1,Town2,Distance). 
+    route(Town1,Town2,Distance):-road(Town1,X,Dist1),route(X,Town2,Dist2),Distance=Dist1+Dist2,!.  
+
+goal route("A", "E", X),
+ write("Distance from A to E is ",X).
+
+===========================================================================================
+
+***Family***
+
+female(jaya).  
+female(shweta).
+female(ritu).
+female(nidhi).
+
+male(amit). 
+male(abhi).
+male(ajit). 
+male(satish). 
+
+
+parent(amit,shweta).
+parent(amit,abhi).
+parent(jaya,abhi).
+parent(abhi,ajit).
+parent(abhi,ritu).
+parent(abhi,nidhi).
+parent(nidhi,satish).
+parent(ajit,satish).
+
+
+mother(X,Y):- parent(X,Y),female(X).
+father(X,Y):- parent(X,Y),male(X).
+haschild(X):- parent(X,_).
+sister(X,Y):- parent(Z,X),parent(Z,Y),female(X),X\==Y.
+brother(X,Y):-parent(Z,X),parent(Z,Y),male(X),X\==Y.
+
+
+grandparent(X,Y) :- parent(X,Z), parent(Z,Y).
+grandmother(X,Z) :- mother(X,Y), parent(Y,Z).
+grandfather(X,Z) :- father(X,Y), parent(Y,Z).
+wife(X,Y) :- parent(X,Z),parent(Y,Z), female(X),male(Y).
+uncle(X,Z) :- brother(X,Y), parent(Y,Z).
+
+===========================================================================================
+
+****last elemnt, delete, unoin & intersection****
+
+last_element([X], X).
+last_element([_|T], X) :- last_element(T, X).
+
+delete_first_occurence(_,[],[]).
+delete_first_occurence(X,[X|Tail],Tail):-!.
+delete_first_occurence(X, [Head|Tail],[Head|Result]) :- delete_first_occurence(X, Tail, Result).
+
+delete_element(_, [], []).
+delete_element(X, [X|Tail], Result) :- delete_element(X, Tail, Result).
+delete_element(X, [Head|Tail], [Head|Result]) :- X\=Head, delete_element(X, Tail, Result).
+
+union([], L, L).
+union([H|T], L, U) :- member(H,L), union(T, L, U).
+union([H|T], L, [H|U]) :- \+ member(H, L), union(T,L,U).
+
+intersection([],_,[]).
+intersection([H|T], L, [H|T]) :- member(H,L), intersection(T,L,I).
+intersection([H|T], L, I) :- \+ member(H,L), intersection(T,L,I).
+
+===========================================================================================
+****Cup Book****
+% Cup Book suppport problem 
+ predicates 
+  ontop(symbol,symbol).
+  supports(symbol,symbol).  
+  touch(symbol,symbol).  
+  above(symbol,symbol).  
+  clauses  
+   ontop(X,Y):-above(X,Y), touch(X,Y).  
+   supports(Y,X):-ontop(X,Y).  
+   above(cup,book).  
+   touch(cup,book). 
+   
+    goal supports(X,Y).
+
+===========================================================================================
+****From Town A to D****
+
+%townB_from_townD  
+
+predicates 
+nondeterm 
+connected(symbol,symbol,symbol)
+bike_allowed(symbol)
+ 
+  nondeterm can_travel(symbol,symbol)  
+  
+clauses 
+can_travel(Y,X):-connected(X,Y,Z),bike_allowed(Z).
+can_travel(Y,X):-can_travel(Z,X),can_travel(Y,Z). 
+connected(a,b,r1). 
+connected(b,c,r2).
+connected(a,c,r3).
+connected(d,e,r4).
+connected(d,b,r5).
+ bike_allowed(r3).
+ bike_allowed(r4).
+ bike_allowed(r5). 
+   
+  goal can_travel(b,d).
+
+===========================================================================================
+****Classical block world****
+
+%tower of hanoi domains
+loc=right;middle;left
+
+predicates
+
+hanoi(integer) - procedure (i).
+
+move(integer,loc,loc,loc) - procedure (i,i,i,i) inform(loc,loc) - procedure (i,i).
+
+clauses
+
+hanoi(N):-move(N,left,middle,right).
+
+move(1,A,_,C):- inform(A,C), !.
+
+move(N,A,B,C):-N1-N-1, move(N1,A,C,B),inform(A,C), move(N1,B,A,C).
+
+inform(Loc1,Loc2):- write("Move a disk from ",Loc1," to ",Loc2),nl.
+
+goal
+
+hanoi(3).
+
+===========================================================================================
+****Monkey Banana****
+
+move(state(middle,onbox,middle,hasnot),grasp,state(middle,onbox,middle,has)).
+move(state(P,onfloor,P,B),climb,state(P,onbox,P,B)).
+move(state(P1,onfloor,P1,B),drag(P1,P2),state(P2,onfloor,P2,B)).
+move(state(P1,onfloor,T,B),walk(P1,P2),state(P2,onfloor,T,B)).
+canget(state(_,_,_,has)).
+canget(State1) :- move(State1,_,State2),canget(State2).
+
+===========================================================================================
+**** SEND + MORE = MONEY ****
+predicates 
+
+nondeterm digit(integer)
+nondeterm solve(integer,integer,integer,integer,integer,integer,integer,integer).
+nondeterm sum(integer,integer,integer,integer,integer,integer,integer,integer).
+
+
+clauses
+digit(0).
+digit(1).
+digit(2).
+digit(3).
+digit(4).
+digit(5).
+digit(6).
+digit(7).
+digit(8).
+digit(9).
+solve(S,E,N,D,M,O,R,Y):- digit(S), S<>0,
+			 digit(E),E<>S,
+			 digit(N),N<>E,N<>S,
+			 digit(D),D<>N,D<>E,D<>S,
+			 digit(M),M<>D,M<>N,M<>E,M<>S,
+			 digit(O),O<>M,O<>D,O<>N,O<>E,O<>S,
+			 digit(R),R<>O,R<>M,R<>D,R<>N,R<>E,R<>S,
+			 digit(Y),Y<>R,Y<>O,Y<>M,R<>D,Y<>N,Y<>E,Y<>S,
+			 sum(S,E,N,D,M,O,R,Y).
+			 
+sum(S,E,N,D,M,O,R,Y):- N1 = 1000*S+100*E+10*N+D,
+		       N2 = 1000*M+100*O+10*R+E,
+		       N3 = 10000*M+1000*O+100*N+10*E+Y,
+		       N3 = N1 + N2.
+		       
+		       
+		       
+goal
+solve(S,E,N,D,M,O,R,Y).
+
+===========================================================================================
+*****DONALD + GERALD = ROBERT****
+
+predicates 
+
+nondeterm digit(integer)
+nondeterm solve(integer,integer,integer,integer,integer,integer,integer,integer,integer,integer)
+nondeterm sum(integer,integer,integer,integer,integer,integer,integer,integer,integer,integer)
+
+
+clauses
+digit(0).
+digit(1).
+digit(2).
+digit(3).
+digit(4).
+digit(5).
+digit(6).
+digit(7).
+digit(8).
+digit(9).
+solve(D,O,N,A,L,G,E,R,B,T) :- digit(D),
+			      digit(O),O<>D,
+			      digit(N),N<>O,N<>D,
+			      digit(A),A<>N,A<>O,A<>D,
+			      digit(L),L<>A,L<>N,L<>O,L<>D,
+			      digit(G),G<>L,G<>A,G<>N,G<>O,G<>D,
+			      digit(E),E<>G,E<>L,E<>A,E<>N,E<>O,E<>D,
+			      digit(R),R<>E,R<>G,R<>L,R<>A,R<>N,R<>O,R<>D,
+			      digit(B),B<>R,B<>E,B<>G,B<>L,B<>A,B<>N,B<>O,B<>D,
+			      digit(T),T<>B,T<>R,T<>E,T<>G,T<>L,T<>A,T<>N,T<>O,T<>D,
+			      sum(D,O,N,A,L,G,E,R,B,T).
+
+
+sum(D,O,N,A,L,G,E,R,B,T) :- N1 = 100000*D+10000*O+1000*N+100*A+10*L+D,
+			    N2 = 100000*G+10000*E+1000*R+100*A+10*L+D,
+			    N3 = 100000*R+10000*O+1000*B+100*E+10*R+T,
+			    N3 = N1+N2.
+			    
+			    
+goal
+solve(D,O,N,A,L,G,E,R,B,T).
+
+*******************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
